@@ -319,7 +319,7 @@
         "minChunkSizeUsd": 200,
         "name": "SushiEth",
         "partner": "Orbs:TWAP:Sushi",
-        "exchangeAddress": "0x04eB53119079FA779492720D1EfeAEBF0aF2e5ad",
+        "exchangeAddress": "0xf38adDc5Cc4dd06D00BD9FEF3d4115A84aa63702",
         "exchangeType": "ExchangeV2",
         "pathfinderKey": ""
     },
