@@ -44,10 +44,9 @@ contract Taker {
         // swap to gas
         bool swapGas = feeSwapExchange != address(0) && o.ask.dstToken != twap.iweth() && o.ask.dstToken != address(0);
         if (swapGas) {
-            ERC20(o.ask.dstToken).safeApprove(feeSwapExchange, dstSenderAmount);
-            IExchange(feeSwapExchange).swap(
-                o.ask.dstToken, twap.iweth(), dstSenderAmount, 0, o.ask.data, feeSwapData, address(this)
-            );
+            ERC20(o.ask.dstToken).forceApprove(feeSwapExchange, dstSenderAmount);
+            IExchange(feeSwapExchange)
+                .swap(o.ask.dstToken, twap.iweth(), dstSenderAmount, 0, o.ask.data, feeSwapData, address(this));
         }
 
         // unwrap

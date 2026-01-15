@@ -53,7 +53,7 @@ contract ParaswapExchange is IExchange {
         srcToken.safeTransferFrom(msg.sender, address(this), amountIn);
         amountIn = srcToken.balanceOf(address(this)); // support FoT tokens
 
-        srcToken.safeIncreaseAllowance(IParaswap(paraswap).getTokenTransferProxy(), amountIn);
+        srcToken.forceApprove(IParaswap(paraswap).getTokenTransferProxy(), amountIn);
         Address.functionCall(address(paraswap), swapdata);
 
         uint256 balance = dstToken.balanceOf(address(this));

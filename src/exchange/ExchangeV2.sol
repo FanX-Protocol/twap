@@ -52,7 +52,7 @@ contract ExchangeV2 is IExchange {
         src.safeTransferFrom(msg.sender, address(this), amountIn);
         amountIn = src.balanceOf(address(this)); // support FoT tokens
 
-        src.safeIncreaseAllowance(router, amountIn);
+        src.forceApprove(router, amountIn);
         Address.functionCall(router, swapData);
 
         uint256 balance = dst.balanceOf(address(this));

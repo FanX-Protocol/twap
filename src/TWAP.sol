@@ -109,9 +109,9 @@ contract TWAP is ReentrancyGuard {
     function ask(OrderLib.Ask calldata _ask) external nonReentrant returns (uint64 id) {
         require(
             _ask.srcToken != address(0) && _ask.srcToken != _ask.dstToken
-                && (_ask.srcToken != iweth || _ask.dstToken != address(0)) && _ask.srcAmount > 0 && _ask.srcBidAmount > 0
-                && _ask.srcBidAmount <= _ask.srcAmount && _ask.dstMinAmount > 0 && _ask.deadline > block.timestamp
-                && _ask.bidDelay >= MIN_BID_DELAY_SECONDS,
+                && (_ask.srcToken != iweth || _ask.dstToken != address(0)) && _ask.srcAmount > 0
+                && _ask.srcBidAmount > 0 && _ask.srcBidAmount <= _ask.srcAmount && _ask.dstMinAmount > 0
+                && _ask.deadline > block.timestamp && _ask.bidDelay >= MIN_BID_DELAY_SECONDS,
             "params"
         );
 
@@ -222,9 +222,8 @@ contract TWAP is ReentrancyGuard {
         require(block.timestamp > o.filledTime + o.ask.fillDelay, "fill delay");
         require(o.ask.exchange == address(0) || o.ask.exchange == exchange, "exchange");
 
-        dstAmountOut = IExchange(exchange).getAmountOut(
-            o.ask.srcToken, _dstToken(o), o.srcBidAmountNext(), o.ask.data, data, msg.sender
-        );
+        dstAmountOut = IExchange(exchange)
+            .getAmountOut(o.ask.srcToken, _dstToken(o), o.srcBidAmountNext(), o.ask.data, data, msg.sender);
         dstAmountOut -= (dstAmountOut * slippagePercent) / PERCENT_BASE;
         dstAmountOut -= dstFee;
 
@@ -257,11 +256,10 @@ contract TWAP is ReentrancyGuard {
 
         ERC20(o.ask.srcToken).safeTransferFrom(o.maker, address(this), srcAmountIn);
         srcAmountIn = ERC20(o.ask.srcToken).balanceOf(address(this)); // support FoT tokens
-        ERC20(o.ask.srcToken).safeIncreaseAllowance(exchange, srcAmountIn);
+        ERC20(o.ask.srcToken).forceApprove(exchange, srcAmountIn);
 
-        IExchange(exchange).swap(
-            o.ask.srcToken, _dstToken(o), srcAmountIn, minOut + dstFee, o.ask.data, o.bid.data, msg.sender
-        );
+        IExchange(exchange)
+            .swap(o.ask.srcToken, _dstToken(o), srcAmountIn, minOut + dstFee, o.ask.data, o.bid.data, msg.sender);
 
         dstAmountOut = ERC20(_dstToken(o)).balanceOf(address(this)); // support FoT tokens
         dstAmountOut -= dstFee;
